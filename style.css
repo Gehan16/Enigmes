@@ -1,0 +1,132 @@
+:root {
+  --fond: #f4f1ea;
+  --carte: #ffffff;
+  --texte: #2b2b2b;
+  --accent: #6c5ce7;
+  --accent-fonce: #5346b8;
+  --vert: #2ecc71;
+  --rouge: #e74c3c;
+  --gris: #8a8a8a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, "Times New Roman", serif;
+  background: var(--fond);
+  color: var(--texte);
+  padding: 1rem;
+}
+
+.card {
+  background: var(--carte);
+  width: 100%;
+  max-width: 560px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 2rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--accent-fonce);
+}
+
+#compteur {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--gris);
+}
+
+#enigme {
+  font-size: 1.15rem;
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+  min-height: 3.5em;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+label {
+  font-weight: bold;
+}
+
+input {
+  font: inherit;
+  padding: 0.65rem 0.75rem;
+  border: 2px solid #d5d0c6;
+  border-radius: 8px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.boutons {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+button {
+  font: inherit;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  transition: background 0.2s;
+}
+
+button:hover { background: var(--accent-fonce); }
+
+button:disabled {
+  background: #cfcac0;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+#indice { background: #f39c12; }
+#indice:hover { background: #d68910; }
+
+#feedback {
+  min-height: 1.5em;
+  margin: 1rem 0 0;
+  font-weight: bold;
+}
+
+#feedback.succes { color: var(--vert); }
+#feedback.echec { color: var(--rouge); }
+#feedback.info { color: var(--gris); }
+
+footer {
+  margin-top: 1.25rem;
+  border-top: 1px solid #e2ddd3;
+  padding-top: 0.75rem;
+  color: var(--gris);
+  font-size: 0.9rem;
+}
+
+footer p { margin: 0; }

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Énigmes du jour</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <header>
+      <h1>Énigmes</h1>
+      <p id="compteur">Énigme 1 / ?</p>
+    </header>
+
+    <section id="zone-enigme">
+      <p id="enigme">Chargement…</p>
+    </section>
+
+    <form id="formulaire" autocomplete="off">
+      <label for="reponse">Votre réponse :</label>
+      <input type="text" id="reponse" placeholder="Tapez votre réponse ici…" required>
+      <div class="boutons">
+        <button type="submit" id="valider">Valider</button>
+        <button type="button" id="indice">Indice</button>
+        <button type="button" id="suivant" disabled>Suivante</button>
+      </div>
+    </form>
+
+    <p id="feedback" role="status" aria-live="polite"></p>
+    <footer>
+      <p>Score : <span id="score">0</span> bonne(s) réponse(s)</p>
+    </footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
