@@ -69,8 +69,10 @@ function normaliser(texte) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
+    .replace(/\u0153/g, "oe")
+    .replace(/\u00e6/g, "ae")
     .replace(/['\u2019]/g, " ")
-    .replace(/^(le|la|les|l|un|une|des|du)\s+/g, "")
+    .replace(/^((le|la|les|l|un|une|des|du|mon|ma|mes|ton|ta|tes|son|sa|ses|notre|nos|votre|vos|lettre|chiffre|nombre)\s+)+/g, "")
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 }
@@ -96,7 +98,7 @@ function definirFeedback(message, type) {
 function donnerIndice() {
   const solution = enigmes[indexCourant].solution;
   const mot = solution
-    .replace(/^(les|la|le|l['\u2019]|une?|des|du)\s*/i, "")
+    .replace(/^(les|la|le|l['\u2019]|une?|des|du|mon|ma|mes|ton|ta|tes|son|sa|ses|notre|nos|votre|vos)\s*/i, "")
     .trim() || solution;
   const nbLettres = mot.replace(/[^a-zà-ÿœæ]/gi, "").length;
   const nbMots = mot.split(/\s+/).length;
