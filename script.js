@@ -95,8 +95,14 @@ function definirFeedback(message, type) {
 
 function donnerIndice() {
   const solution = enigmes[indexCourant].solution;
-  const indice = `${solution.length} lettres — commence par « ${solution[0].toUpperCase()} »`;
-  definirFeedback(indice, "info");
+  const mot = solution
+    .replace(/^(les|la|le|l['\u2019]|une?|des|du)\s*/i, "")
+    .trim() || solution;
+  const nbLettres = mot.replace(/[^a-zà-ÿœæ]/gi, "").length;
+  const nbMots = mot.split(/\s+/).length;
+  const detail = nbMots > 1 ? ` lettres et ${nbMots} mots` : " lettres";
+  const debut = mot[0].toUpperCase();
+  definirFeedback(`${nbLettres} ${detail.trim()} — commence par « ${debut} »`, "info");
 }
 
 function validerReponse(evenement) {
