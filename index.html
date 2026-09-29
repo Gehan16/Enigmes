@@ -10,29 +10,48 @@
   <div id="bandeau-construction" role="alert">🚧 Site en cours de construction 🚧</div>
 
   <main class="card">
-    <header>
-      <h1>Énigmes</h1>
-      <p id="compteur">Énigme 1 / ?</p>
-    </header>
-
-    <section id="zone-enigme">
-      <p id="enigme">Chargement…</p>
+    <section id="ecran-menu">
+      <header>
+        <h1>Énigmes</h1>
+        <p>Choisissez un niveau. Terminez toutes les énigmes d'un niveau pour obtenir le mot de passe du suivant.</p>
+      </header>
+      <div id="liste-niveaux" class="liste-niveaux"></div>
+      <form id="form-mot-de-passe" autocomplete="off" hidden>
+        <label for="saisie-mot-de-passe" id="libelle-mot-de-passe">Mot de passe du niveau :</label>
+        <input type="password" id="saisie-mot-de-passe" placeholder="Mot de passe…" required>
+        <div class="boutons">
+          <button type="submit" id="valider-mot-de-passe">Débloquer</button>
+          <button type="button" id="annuler-mot-de-passe">Annuler</button>
+        </div>
+        <p id="retour-mot-de-passe" role="status" aria-live="polite"></p>
+      </form>
     </section>
 
-    <form id="formulaire" autocomplete="off">
-      <label for="reponse">Votre réponse :</label>
-      <input type="text" id="reponse" placeholder="Tapez votre réponse ici…" required>
-      <div class="boutons">
-        <button type="submit" id="valider">Valider</button>
-        <button type="button" id="indice">Indice</button>
-        <button type="button" id="suivant" disabled>Suivante</button>
-      </div>
-    </form>
+    <section id="ecran-jeu" hidden>
+      <header>
+        <h1 id="titre-niveau">Niveau 1</h1>
+        <p id="compteur">Énigme 1 / ?</p>
+      </header>
 
-    <p id="feedback" role="status" aria-live="polite"></p>
-    <footer>
-      <p>Score : <span id="score">0</span> bonne(s) réponse(s)</p>
-    </footer>
+      <section id="zone-enigme">
+        <p id="enigme">Chargement…</p>
+      </section>
+
+      <form id="formulaire" autocomplete="off">
+        <label for="reponse">Votre réponse :</label>
+        <input type="text" id="reponse" placeholder="Tapez votre réponse ici…" required>
+        <div class="boutons">
+          <button type="submit" id="valider">Valider</button>
+          <button type="button" id="indice">Indice</button>
+          <button type="button" id="suivant" disabled>Suivante</button>
+        </div>
+      </form>
+
+      <p id="feedback" role="status" aria-live="polite"></p>
+      <footer>
+        <button type="button" id="retour-menu">← Retour au menu</button>
+      </footer>
+    </section>
   </main>
   <script src="script.js"></script>
 </body>

@@ -2,21 +2,34 @@
 
 const CSV_URL = "enigmes.csv";
 const SEPARATEUR = ",";
+const NB_NIVEAUX = 10;
+const CLE_STOCKAGE = "enigmes-niveaux-debloques";
 
 let enigmes = [];
+let niveauCourant = 1;
 let indexCourant = 0;
-let score = 0;
+let niveauEnCours = null;
+let niveauChoisi = null;
 const clavierVirtuel = window.matchMedia("(pointer: coarse)").matches;
 
+const elEcranMenu = document.getElementById("ecran-menu");
+const elEcranJeu = document.getElementById("ecran-jeu");
+const elListeNiveaux = document.getElementById("liste-niveaux");
+const elFormMotDePasse = document.getElementById("form-mot-de-passe");
+const elSaisieMotDePasse = document.getElementById("saisie-mot-de-passe");
+const elLibelleMotDePasse = document.getElementById("libelle-mot-de-passe");
+const elRetourMotDePasse = document.getElementById("retour-mot-de-passe");
+
+const elTitreNiveau = document.getElementById("titre-niveau");
 const elEnigme = document.getElementById("enigme");
 const elCompteur = document.getElementById("compteur");
 const elFormulaire = document.getElementById("formulaire");
 const elReponse = document.getElementById("reponse");
 const elFeedback = document.getElementById("feedback");
-const elScore = document.getElementById("score");
 const boutonValider = document.getElementById("valider");
 const boutonIndice = document.getElementById("indice");
 const boutonSuivant = document.getElementById("suivant");
+const boutonRetourMenu = document.getElementById("retour-menu");
 
 function parseCSV(texte) {
   const lignes = texte.trim().split(/\r?\n/);
@@ -24,6 +37,7 @@ function parseCSV(texte) {
   const colId = enTetes.indexOf("id");
   const colEnigme = enTetes.indexOf("enigme");
   const colSolution = enTetes.indexOf("solution");
+  const colNiveau = enTetes.indexOf("niveau");
 
   const resultat = [];
   for (let i = 1; i < lignes.length; i++) {
@@ -34,6 +48,7 @@ function parseCSV(texte) {
       id: colId >= 0 ? champs[colId].trim() : String(i),
       enigme: champs[colEnigme].trim(),
       solution: champs[colSolution].trim(),
+      niveau: colNiveau >= 0 ? parseInt(champs[colNiveau], 10) || 1 : 1,
       tentatives: 0
     });
   }
@@ -78,17 +93,8 @@ function normaliser(texte) {
     .trim();
 }
 
-function afficherEnigme() {
-  const e = enigmes[indexCourant];
-  elEnigme.textContent = e.enigme;
-  elCompteur.textContent = `Énigme ${indexCourant + 1} / ${enigmes.length}`;
-  elReponse.value = "";
-  elReponse.disabled = false;
-  if (!clavierVirtuel) elReponse.focus();
-  boutonValider.disabled = false;
-  boutonIndice.disabled = false;
-  boutonSuivant.disabled = enigmes.length <= 1;
-  definirFeedback("", "info");
+function motDePasseNiveau(niveau) {
+  return "bravo-niveau-" + niveau;
 }
 
 function definirFeedback(message, type) {
@@ -96,8 +102,152 @@ function definirFeedback(message, type) {
   elFeedback.className = type || "";
 }
 
+function chargerEtat() {
+  try {
+    const brut = JSON.parse(localStorage.getItem(CLE_STOCKAGE) || "{}");
+    return Number.isInteger(brut.niveauMaxDebloque) && brut.niveauMaxDebloque >= 1
+      ? Math.min(brut.niveauMaxDebloque, NB_NIVEAUX)
+      : 1;
+  } catch {
+    return 1;
+  }
+}
+
+function sauverEtat(niveauMaxDebloque) {
+  try {
+    localStorage.setItem(CLE_STOCKAGE, JSON.stringify({ niveauMaxDebloque }));
+  } catch {
+    /* stockage indisponible */
+  }
+}
+
+function niveauMaxDebloque() {
+  return chargerEtat();
+}
+
+function enigmesDuNiveau(niveau) {
+  return enigmes.filter(e => e.niveau === niveau);
+}
+
+function afficherMenu() {
+  elEcranJeu.hidden = true;
+  elEcranMenu.hidden = false;
+  elFormMotDePasse.hidden = true;
+  elRetourMotDePasse.textContent = "";
+  niveauChoisi = null;
+  construireListeNiveaux();
+}
+
+function construireListeNiveaux() {
+  elListeNiveaux.textContent = "";
+  const debloque = niveauMaxDebloque();
+
+  for (let niveau = 1; niveau <= NB_NIVEAUX; niveau++) {
+    const nb = enigmesDuNiveau(niveau).length;
+    const carte = document.createElement("button");
+    carte.type = "button";
+    carte.className = "carte-niveau";
+    if (niveau > debloque) carte.classList.add("verrouille");
+
+    const titre = document.createElement("span");
+    titre.className = "niveau-titre";
+    titre.textContent = "Niveau " + niveau;
+    carte.appendChild(titre);
+
+    const detail = document.createElement("span");
+    detail.className = "niveau-detail";
+    if (niveau < debloque) {
+      detail.textContent = "Terminé";
+    } else if (niveau === debloque && niveau === NB_NIVEAUX) {
+      detail.textContent = nb + " énigme(s) — dernier niveau";
+    } else {
+      detail.textContent = nb + " énigme(s)";
+    }
+    carte.appendChild(detail);
+
+    if (niveau > debloque) {
+      const cadenas = document.createElement("span");
+      cadenas.className = "niveau-cadenas";
+      cadenas.textContent = "🔒";
+      carte.appendChild(cadenas);
+    }
+
+    carte.addEventListener("click", () => choisirNiveau(niveau));
+    elListeNiveaux.appendChild(carte);
+  }
+}
+
+function choisirNiveau(niveau) {
+  if (niveau > niveauMaxDebloque()) {
+    demanderMotDePasse(niveau);
+  } else {
+    demarrerNiveau(niveau);
+  }
+}
+
+function demanderMotDePasse(niveau) {
+  niveauChoisi = niveau;
+  elFormMotDePasse.hidden = false;
+  elLibelleMotDePasse.textContent = "Mot de passe du niveau " + niveau + " :";
+  elSaisieMotDePasse.value = "";
+  elRetourMotDePasse.textContent = "";
+  elRetourMotDePasse.className = "";
+  elSaisieMotDePasse.focus();
+  elFormMotDePasse.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function validerMotDePasse(evenement) {
+  evenement.preventDefault();
+  const saisie = elSaisieMotDePasse.value.trim();
+
+  if (!niveauChoisi) return;
+
+  if (saisie === motDePasseNiveau(niveauChoisi)) {
+    const debloque = niveauMaxDebloque();
+    if (niveauChoisi > debloque) {
+      sauverEtat(niveauChoisi);
+    }
+    demarrerNiveau(niveauChoisi);
+  } else {
+    elRetourMotDePasse.textContent = "Mot de passe incorrect.";
+    elRetourMotDePasse.className = "echec";
+    elSaisieMotDePasse.select();
+  }
+}
+
+function annulerMotDePasse() {
+  elFormMotDePasse.hidden = true;
+  elSaisieMotDePasse.value = "";
+  elRetourMotDePasse.textContent = "";
+  niveauChoisi = null;
+}
+
+function demarrerNiveau(niveau) {
+  niveauCourant = niveau;
+  niveauEnCours = enigmesDuNiveau(niveau);
+  niveauEnCours.forEach(e => { e.tentatives = 0; });
+  indexCourant = 0;
+  elEcranMenu.hidden = true;
+  elEcranJeu.hidden = false;
+  elTitreNiveau.textContent = "Niveau " + niveau;
+  afficherEnigme();
+}
+
+function afficherEnigme() {
+  const e = niveauEnCours[indexCourant];
+  elEnigme.textContent = e.enigme;
+  elCompteur.textContent = `Énigme ${indexCourant + 1} / ${niveauEnCours.length}`;
+  elReponse.value = "";
+  elReponse.disabled = false;
+  if (!clavierVirtuel) elReponse.focus();
+  boutonValider.disabled = false;
+  boutonIndice.disabled = false;
+  boutonSuivant.disabled = niveauEnCours.length <= 1;
+  definirFeedback("", "info");
+}
+
 function donnerIndice() {
-  const solution = enigmes[indexCourant].solution;
+  const solution = niveauEnCours[indexCourant].solution;
   const mot = solution
     .replace(/^(les|la|le|l['\u2019]|une?|des|du|mon|ma|mes|ton|ta|tes|son|sa|ses|notre|nos|votre|vos)\s*/i, "")
     .trim() || solution;
@@ -110,7 +260,7 @@ function donnerIndice() {
 
 function validerReponse(evenement) {
   evenement.preventDefault();
-  const enigme = enigmes[indexCourant];
+  const enigme = niveauEnCours[indexCourant];
   const reponseUtilisateur = normaliser(elReponse.value);
   const reponseAttendue = normaliser(enigme.solution);
 
@@ -126,23 +276,54 @@ function validerReponse(evenement) {
       ? `Bravo ! C'était bien « ${enigme.solution} ».`
       : `Bien joué ! La réponse était « ${enigme.solution} ».`;
     definirFeedback(message, "succes");
-    if (enigme.tentatives === 1) {
-      score++;
-      elScore.textContent = score;
-    }
     elReponse.disabled = true;
     boutonValider.disabled = true;
     boutonIndice.disabled = true;
     boutonSuivant.disabled = false;
+    boutonSuivant.textContent = finNiveau() ? "Terminer le niveau" : "Suivante";
   } else {
     definirFeedback("Ce n'est pas la bonne réponse, réessayez !", "echec");
     elReponse.select();
   }
 }
 
+function finNiveau() {
+  return indexCourant >= niveauEnCours.length - 1;
+}
+
 function enigmeSuivante() {
-  indexCourant = (indexCourant + 1) % enigmes.length;
+  if (finNiveau()) {
+    terminerNiveau();
+    return;
+  }
+  indexCourant++;
+  boutonSuivant.textContent = "Suivante";
   afficherEnigme();
+}
+
+function terminerNiveau() {
+  const debloque = niveauMaxDebloque();
+  if (niveauCourant === NB_NIVEAUX) {
+    definirFeedback(
+      "🎉 Félicitations ! Vous avez résolu toutes les énigmes des 10 niveaux. Vous êtes un vrai maître des énigmes ! 🎉",
+      "succes"
+    );
+    elReponse.disabled = true;
+    boutonValider.disabled = true;
+    boutonIndice.disabled = true;
+    boutonSuivant.disabled = true;
+    boutonSuivant.textContent = "Suivante";
+    return;
+  }
+
+  const motDePasse = motDePasseNiveau(niveauCourant + 1);
+  definirFeedback(
+    `Niveau ${niveauCourant} terminé ! Le mot de passe du niveau ${niveauCourant + 1} est : « ${motDePasse} »`,
+    "succes"
+  );
+  if (niveauCourant + 1 > debloque) {
+    sauverEtat(niveauCourant + 1);
+  }
 }
 
 async function init() {
@@ -158,8 +339,10 @@ async function init() {
       boutonIndice.disabled = true;
       return;
     }
-    afficherEnigme();
+    afficherMenu();
   } catch (erreur) {
+    elEcranMenu.hidden = true;
+    elEcranJeu.hidden = false;
     elEnigme.textContent =
       "Impossible de charger le fichier enigmes.csv. " +
       "Ouvrez la page via un petit serveur local (ex. : python3 -m http.server) " +
@@ -173,5 +356,8 @@ async function init() {
 elFormulaire.addEventListener("submit", validerReponse);
 boutonIndice.addEventListener("click", donnerIndice);
 boutonSuivant.addEventListener("click", enigmeSuivante);
+boutonRetourMenu.addEventListener("click", afficherMenu);
+elFormMotDePasse.addEventListener("submit", validerMotDePasse);
+document.getElementById("annuler-mot-de-passe").addEventListener("click", annulerMotDePasse);
 
 init();

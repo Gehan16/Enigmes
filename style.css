@@ -249,3 +249,81 @@ footer p {
   #enigme { font-size: 1.05rem; }
   .boutons button { flex: 1; }
 }
+
+/* ----- Menu des niveaux ----- */
+
+.liste-niveaux {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.carte-niveau {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  background: var(--carte);
+  border: 1px solid var(--carte-bord);
+  border-radius: 12px;
+  color: var(--texte);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.carte-niveau:hover:not(.verrouille) {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.carte-niveau.verrouille {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.niveau-titre {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.niveau-detail {
+  font-size: 0.8rem;
+  color: var(--texte-2);
+}
+
+.niveau-cadenas {
+  font-size: 1rem;
+}
+
+#form-mot-de-passe {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--carte-bord);
+}
+
+#form-mot-de-passe .boutons {
+  margin-top: 0.75rem;
+}
+
+#retour-menu {
+  margin-top: 0.75rem;
+  background: none;
+  border: 1px solid var(--carte-bord);
+  border-radius: 10px;
+  color: var(--texte-2);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+#retour-menu:hover {
+  color: var(--texte);
+  border-color: var(--accent);
+}
+
+@media (max-width: 480px) {
+  .liste-niveaux {
+    grid-template-columns: 1fr;
+  }
+}
