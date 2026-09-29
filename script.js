@@ -6,6 +6,7 @@ const SEPARATEUR = ",";
 let enigmes = [];
 let indexCourant = 0;
 let score = 0;
+const clavierVirtuel = window.matchMedia("(pointer: coarse)").matches;
 
 const elEnigme = document.getElementById("enigme");
 const elCompteur = document.getElementById("compteur");
@@ -83,7 +84,7 @@ function afficherEnigme() {
   elCompteur.textContent = `Énigme ${indexCourant + 1} / ${enigmes.length}`;
   elReponse.value = "";
   elReponse.disabled = false;
-  elReponse.focus();
+  if (!clavierVirtuel) elReponse.focus();
   boutonValider.disabled = false;
   boutonIndice.disabled = false;
   boutonSuivant.disabled = enigmes.length <= 1;
@@ -133,7 +134,6 @@ function validerReponse(evenement) {
     boutonValider.disabled = true;
     boutonIndice.disabled = true;
     boutonSuivant.disabled = false;
-    boutonSuivant.focus();
   } else {
     definirFeedback("Ce n'est pas la bonne réponse, réessayez !", "echec");
     elReponse.select();
