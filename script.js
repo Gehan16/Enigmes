@@ -29,6 +29,7 @@ const elFeedback = document.getElementById("feedback");
 const boutonValider = document.getElementById("valider");
 const boutonIndice = document.getElementById("indice");
 const boutonSuivant = document.getElementById("suivant");
+const boutonPrecedente = document.getElementById("precedente");
 const boutonRetourMenu = document.getElementById("retour-menu");
 
 function parseCSV(texte) {
@@ -225,7 +226,7 @@ function annulerMotDePasse() {
 function demarrerNiveau(niveau) {
   niveauCourant = niveau;
   niveauEnCours = enigmesDuNiveau(niveau);
-  niveauEnCours.forEach(e => { e.tentatives = 0; });
+  niveauEnCours.forEach(e => { e.tentatives = 0; e.resolue = false; });
   indexCourant = 0;
   elEcranMenu.hidden = true;
   elEcranJeu.hidden = false;
@@ -233,17 +234,33 @@ function demarrerNiveau(niveau) {
   afficherEnigme();
 }
 
+function nbResolues() {
+  return niveauEnCours.filter(e => e.resolue).length;
+}
+
+function toutesResolues() {
+  return nbResolues() === niveauEnCours.length;
+}
+
 function afficherEnigme() {
   const e = niveauEnCours[indexCourant];
   elEnigme.textContent = e.enigme;
-  elCompteur.textContent = `Énigme ${indexCourant + 1} / ${niveauEnCours.length}`;
+  elCompteur.textContent = `Énigme ${indexCourant + 1} / ${niveauEnCours.length} — ${nbResolues()} résolue(s)`;
   elReponse.value = "";
-  elReponse.disabled = false;
-  if (!clavierVirtuel) elReponse.focus();
-  boutonValider.disabled = false;
-  boutonIndice.disabled = false;
+  if (e.resolue) {
+    elReponse.disabled = true;
+    boutonValider.disabled = true;
+    boutonIndice.disabled = true;
+    definirFeedback(`Déjà résolue : « ${e.solution} » ✅`, "succes");
+  } else {
+    elReponse.disabled = false;
+    boutonValider.disabled = false;
+    boutonIndice.disabled = false;
+    if (!clavierVirtuel) elReponse.focus();
+    definirFeedback("", "info");
+  }
   boutonSuivant.disabled = niveauEnCours.length <= 1;
-  definirFeedback("", "info");
+  boutonPrecedente.disabled = niveauEnCours.length <= 1;
 }
 
 function donnerIndice() {
@@ -272,32 +289,32 @@ function validerReponse(evenement) {
   enigme.tentatives++;
 
   if (reponseUtilisateur === reponseAttendue) {
-    const message = enigme.tentatives === 1
-      ? `Bravo ! C'était bien « ${enigme.solution} ».`
-      : `Bien joué ! La réponse était « ${enigme.solution} ».`;
-    definirFeedback(message, "succes");
+    enigme.resolue = true;
+    elCompteur.textContent = `Énigme ${indexCourant + 1} / ${niveauEnCours.length} — ${nbResolues()} résolue(s)`;
     elReponse.disabled = true;
     boutonValider.disabled = true;
     boutonIndice.disabled = true;
-    boutonSuivant.disabled = false;
-    boutonSuivant.textContent = finNiveau() ? "Terminer le niveau" : "Suivante";
+    if (toutesResolues()) {
+      terminerNiveau();
+    } else {
+      const restantes = niveauEnCours.length - nbResolues();
+      const message = (enigme.tentatives === 1 ? "Bravo !" : "Bien joué !")
+        + ` C'était bien « ${enigme.solution} ». Il reste ${restantes} énigme(s) à résoudre dans ce niveau.`;
+      definirFeedback(message, "succes");
+    }
   } else {
     definirFeedback("Ce n'est pas la bonne réponse, réessayez !", "echec");
     elReponse.select();
   }
 }
 
-function finNiveau() {
-  return indexCourant >= niveauEnCours.length - 1;
+function enigmeSuivante() {
+  indexCourant = (indexCourant + 1) % niveauEnCours.length;
+  afficherEnigme();
 }
 
-function enigmeSuivante() {
-  if (finNiveau()) {
-    terminerNiveau();
-    return;
-  }
-  indexCourant++;
-  boutonSuivant.textContent = "Suivante";
+function enigmePrecedente() {
+  indexCourant = (indexCourant - 1 + niveauEnCours.length) % niveauEnCours.length;
   afficherEnigme();
 }
 
@@ -308,17 +325,13 @@ function terminerNiveau() {
       "🎉 Félicitations ! Vous avez résolu toutes les énigmes des 10 niveaux. Vous êtes un vrai maître des énigmes ! 🎉",
       "succes"
     );
-    elReponse.disabled = true;
-    boutonValider.disabled = true;
-    boutonIndice.disabled = true;
-    boutonSuivant.disabled = true;
-    boutonSuivant.textContent = "Suivante";
     return;
   }
 
   const motDePasse = motDePasseNiveau(niveauCourant + 1);
   definirFeedback(
-    `Niveau ${niveauCourant} terminé ! Le mot de passe du niveau ${niveauCourant + 1} est : « ${motDePasse} »`,
+    `Niveau ${niveauCourant} terminé ! Vous avez résolu toutes les énigmes du niveau. ` +
+    `Le mot de passe du niveau ${niveauCourant + 1} est : « ${motDePasse} »`,
     "succes"
   );
   if (niveauCourant + 1 > debloque) {
@@ -356,6 +369,7 @@ async function init() {
 elFormulaire.addEventListener("submit", validerReponse);
 boutonIndice.addEventListener("click", donnerIndice);
 boutonSuivant.addEventListener("click", enigmeSuivante);
+boutonPrecedente.addEventListener("click", enigmePrecedente);
 boutonRetourMenu.addEventListener("click", afficherMenu);
 elFormMotDePasse.addEventListener("submit", validerMotDePasse);
 document.getElementById("annuler-mot-de-passe").addEventListener("click", annulerMotDePasse);
