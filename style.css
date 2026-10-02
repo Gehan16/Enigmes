@@ -315,8 +315,51 @@ footer p {
   border-color: var(--teinte-niveau, var(--accent));
 }
 
-#titre-niveau {
-  color: var(--teinte-niveau, var(--texte));
+#ecran-jeu h1 {
+  background: linear-gradient(90deg, var(--teinte-niveau), color-mix(in srgb, var(--teinte-niveau) 55%, #ffffff));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+#ecran-jeu #compteur {
+  background: color-mix(in srgb, var(--teinte-niveau) 16%, transparent);
+  border-color: color-mix(in srgb, var(--teinte-niveau) 35%, transparent);
+  color: color-mix(in srgb, var(--teinte-niveau) 55%, #ffffff);
+}
+
+#ecran-jeu #enigme {
+  border-left-color: var(--teinte-niveau);
+  background: color-mix(in srgb, var(--teinte-niveau) 7%, rgba(255, 255, 255, 0.045));
+}
+
+#ecran-jeu input:focus {
+  border-color: var(--teinte-niveau);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--teinte-niveau) 22%, transparent);
+}
+
+#ecran-jeu button {
+  background: linear-gradient(135deg, var(--teinte-niveau), color-mix(in srgb, var(--teinte-niveau) 60%, #000000));
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--teinte-niveau) 35%, transparent);
+}
+
+#ecran-jeu button:hover {
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--teinte-niveau) 45%, transparent);
+}
+
+#ecran-jeu #suivant {
+  background: linear-gradient(135deg, var(--teinte-niveau), color-mix(in srgb, var(--teinte-niveau) 55%, #000000));
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--teinte-niveau) 30%, transparent);
+}
+
+#ecran-jeu #indice {
+  color: color-mix(in srgb, var(--teinte-niveau) 70%, #ffffff);
+}
+
+#ecran-jeu #retour-menu {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--carte-bord);
+  box-shadow: none;
+  color: var(--texte);
 }
 
 #form-mot-de-passe {

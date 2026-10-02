@@ -232,7 +232,7 @@ function demarrerNiveau(niveau) {
   elEcranMenu.hidden = true;
   elEcranJeu.hidden = false;
   elTitreNiveau.textContent = "Niveau " + niveau;
-  elTitreNiveau.className = "titre-niveau theme-niveau-" + niveau;
+  elEcranJeu.className = "theme-niveau-" + niveau;
   afficherEnigme();
 }
 
@@ -354,7 +354,8 @@ async function init() {
       boutonIndice.disabled = true;
       return;
     }
-    afficherMenu();
+    elEcranJeu.className = "";
+  afficherMenu();
   } catch (erreur) {
     elEcranMenu.hidden = true;
     elEcranJeu.hidden = false;
