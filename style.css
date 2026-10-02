@@ -271,7 +271,6 @@ footer p {
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
-
 .carte-niveau:hover:not(.verrouille) {
   transform: translateY(-2px);
   border-color: var(--accent);
@@ -294,6 +293,30 @@ footer p {
 
 .niveau-cadenas {
   font-size: 1rem;
+}
+
+/* ----- Tons de couleurs par niveau ----- */
+.theme-niveau-1 { --teinte-niveau: #3b82f6; }
+.theme-niveau-2 { --teinte-niveau: #22d3ee; }
+.theme-niveau-3 { --teinte-niveau: #34d399; }
+.theme-niveau-4 { --teinte-niveau: #a3e635; }
+.theme-niveau-5 { --teinte-niveau: #facc15; }
+.theme-niveau-6 { --teinte-niveau: #fb923c; }
+.theme-niveau-7 { --teinte-niveau: #f97316; }
+.theme-niveau-8 { --teinte-niveau: #ef4444; }
+.theme-niveau-9 { --teinte-niveau: #dc2626; }
+.theme-niveau-10 { --teinte-niveau: #4b5563; }
+
+.carte-niveau {
+  border-left: 4px solid var(--teinte-niveau, var(--accent));
+}
+
+.carte-niveau:hover:not(.verrouille) {
+  border-color: var(--teinte-niveau, var(--accent));
+}
+
+#titre-niveau {
+  color: var(--teinte-niveau, var(--texte));
 }
 
 #form-mot-de-passe {

@@ -148,6 +148,7 @@ function construireListeNiveaux() {
     const carte = document.createElement("button");
     carte.type = "button";
     carte.className = "carte-niveau";
+    carte.classList.add("theme-niveau-" + niveau);
     if (niveau > debloque) carte.classList.add("verrouille");
 
     const titre = document.createElement("span");
@@ -231,6 +232,7 @@ function demarrerNiveau(niveau) {
   elEcranMenu.hidden = true;
   elEcranJeu.hidden = false;
   elTitreNiveau.textContent = "Niveau " + niveau;
+  elTitreNiveau.className = "titre-niveau theme-niveau-" + niveau;
   afficherEnigme();
 }
 
