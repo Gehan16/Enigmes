@@ -225,6 +225,7 @@ function annulerMotDePasse() {
 }
 
 function demarrerNiveau(niveau) {
+  elFormMotDePasse.hidden = true;
   niveauCourant = niveau;
   niveauEnCours = enigmesDuNiveau(niveau);
   niveauEnCours.forEach(e => { e.tentatives = 0; e.resolue = false; });
